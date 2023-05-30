@@ -47,6 +47,31 @@ app.post('/api/v1/tours', (req, res) => {
   )
 })
 
+app.patch('/api/v1/tours/:id', (req, res) => {
+  const id = Number(req.params.id)
+  const index = tours.findIndex((el) => el.id === id)
+  if (index === -1) {
+    return res.status(404).json({
+      status: 'fail',
+      message: 'Invalid Id',
+    })
+  }
+  tours[index] = { ...tours[index], ...req.body }
+  console.log({ tour: tours[index] })
+  fs.writeFile(
+    `${__dirname}/dev-data/data/tours-simple.json`,
+    JSON.stringify(tours),
+    (err) => {
+      res.status(201).send({
+        status: 'success',
+        data: {
+          tour: tours[index],
+        },
+      })
+    }
+  )
+})
+
 const port = 3000
 app.listen(port, () => {
   console.log(`App running on port ${port}`)
