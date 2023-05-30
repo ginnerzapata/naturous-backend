@@ -4,6 +4,10 @@ const express = require('express')
 const app = express()
 //middleware to use json
 app.use(express.json())
+app.use((req, res, next) => {
+  req.requestTime = new Date().toISOString()
+  next()
+})
 
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
@@ -11,7 +15,12 @@ const tours = JSON.parse(
 const getAllTours = (req, res) => {
   res
     .status(200)
-    .json({ status: 'success', results: tours.length, data: { tours } })
+    .json({
+      status: 'success',
+      results: tours.length,
+      requestedAt: req.requestTime,
+      data: { tours },
+    })
 }
 
 const getSingleTour = (req, res) => {
