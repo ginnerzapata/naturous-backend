@@ -57,7 +57,6 @@ app.patch('/api/v1/tours/:id', (req, res) => {
     })
   }
   tours[index] = { ...tours[index], ...req.body }
-  console.log({ tour: tours[index] })
   fs.writeFile(
     `${__dirname}/dev-data/data/tours-simple.json`,
     JSON.stringify(tours),
@@ -71,7 +70,28 @@ app.patch('/api/v1/tours/:id', (req, res) => {
     }
   )
 })
-
+app.delete('/api/v1/tours/:id', (req, res) => {
+  const id = Number(req.params.id)
+  const filtered = tours.filter((el) => el.id !== id)
+  if (filtered.length >= tours.length) {
+    return res.status(404).json({
+      status: 'fail',
+      message: 'Invalid Id',
+    })
+  }
+  fs.writeFile(
+    `${__dirname}/dev-data/data/tours-simple.json`,
+    JSON.stringify(filtered),
+    (err) => {
+      res.status(201).send({
+        status: 'success',
+        data: {
+          tour: id,
+        },
+      })
+    }
+  )
+})
 const port = 3000
 app.listen(port, () => {
   console.log(`App running on port ${port}`)
